@@ -5,8 +5,8 @@
   "description": "API for STEP Coin Admin Panel",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "index.js",
+    "dev": "index.js",
     "seed": "node seed.js"
   },
   "dependencies": {
