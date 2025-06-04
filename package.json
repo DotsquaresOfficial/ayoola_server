@@ -1,7 +1,7 @@
 {
   "name": "coin-fund",
   "version": "1.0.0",
-  "description": "CRUD operation using Node.js, Express.js, and MySQL",
+  "description": "",
   "main": "index.js",
   "engines": {
     "node": "22.x"
