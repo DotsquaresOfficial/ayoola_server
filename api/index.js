@@ -37,10 +37,4 @@ app.use('/api/v1/auth', authRoutes);
 // Error middleware
 app.use(errorMiddleware);
 
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-
 module.exports = app;
