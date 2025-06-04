@@ -23,12 +23,12 @@ app.use(morgan("common"));
 app.use(cors());
 
 // Serve public folder
-app.use(express.static(path.join("../",__dirname, 'public', )));
+app.use(express.static(path.join(__dirname,"..", 'public', )));
 
 // Default route
 // Serve index.html when '/' is accessed
 app.get('/', (req, res) => {
-  res.sendFile(path.join("../",__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname,"..", 'public', 'index.html'));
 });
 
 // Auth Route
