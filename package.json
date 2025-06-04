@@ -1,23 +1,39 @@
 {
-  "name": "stepcoin-api",
+  "name": "coin-fund",
   "version": "1.0.0",
-  "description": "API for STEP Coin Admin Panel",
+  "description": "CRUD operation using Node.js, Express.js, and MySQL",
   "main": "index.js",
-  "scripts": {
-    "start": "nodemon index.js",
-    "dev": "nodemon index.js",
-    "seed": "nodemon node seed.js"
+  "engines": {
+    "node": "22.x"
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express"
+  ],
+  "author": "Ram Krishan Pandey",
+  "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.3",
-    "vercel": "^41.7.4"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0",
+    "resend": "^4.5.1",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.1.9"
   }
 }

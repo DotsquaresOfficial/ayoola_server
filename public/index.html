@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coin Fund API</title>
+    <meta name="description" content="Landing page for Coin Fund API. Find the API documentation here." />
+    <meta name="author" content="Coin Fund" />
+
+    <meta property="og:title" content="Coin Fund API" />
+    <meta property="og:description" content="Landing page for Coin Fund API. Find the API documentation here." />
+    <meta property="og:type" content="website" />
+
+    <style>
+        body {
+            background-color: #12181f;
+            color: #EAEAEA;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 2rem;
+            box-sizing: border-box;
+            margin: 0;
+            opacity: 0; /* Start hidden for fade-in animation */
+            animation: pageLoadFadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes pageLoadFadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: calc(80vh - 4rem);
+            width: 100%;
+            padding-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(25px);
+            animation: fadeInSlideUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) 0.2s forwards;
+        }
+
+        .hero-header {
+            margin-bottom: 2rem;
+        }
+
+        h1.main-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+
+        p.sub-text {
+            font-size: clamp(1.1rem, 3vw, 1.35rem);
+            color: #C0C0C0;
+            margin-bottom: 3rem;
+            line-height: 1.75;
+        }
+        
+        .hero-main {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        a.button-primary, a.button-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(255, 108, 55, 0.25), 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        a.button-primary {
+            background-color: #FF6C37; /* Postman Orange */
+        }
+        
+        a.button-secondary {
+            background-color: #33A0FF; /* Blue for contact */
+        }
+
+        a.button-primary:hover, a.button-secondary:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 108, 55, 0.35), 0 3px 8px rgba(255, 108, 55, 0.2);
+        }
+        
+        a.button-secondary:hover {
+             box-shadow: 0 10px 20px rgba(51, 160, 255, 0.35), 0 3px 8px rgba(51, 160, 255, 0.25);
+        }
+
+        .icon-placeholder { /* Placeholder for icons */
+            margin-right: 10px;
+            display: inline-block; /* was flex */
+        }
+
+        .content-section {
+            width: 100%;
+            max-width: 900px;
+            padding: 3rem 1rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            border-top: 1px solid #2a3038;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInSlideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        
+        /* Stagger animations for sections */
+        .content-section:nth-of-type(1) { animation-delay: 0.5s; }
+        .content-section:nth-of-type(2) { animation-delay: 0.6s; }
+        .content-section:nth-of-type(3) { animation-delay: 0.7s; }
+        .content-section:nth-of-type(4) { animation-delay: 0.8s; }
+
+
+        @keyframes fadeInSlideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2.section-title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: #FFFFFF;
+            margin-bottom: 2.5rem;
+            font-weight: 600;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: #1a2027;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 280px;
+            min-height: 180px; /* Adjusted min-height */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: left;
+            border: 1px solid #2a3038;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.03) translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        h3.card-title {
+            font-size: 1.4rem;
+            color: #FF6C37;
+            margin-bottom: 1rem;
+            display: flex; /* was flex */
+            align-items: center;
+        }
+        
+        .card-title .icon-placeholder { /* Specific styling for icon placeholder in card title */
+            color: #FF6C37; /* Match title color */
+        }
+
+        p.card-text {
+            font-size: 1rem;
+            color: #C0C0C0;
+            line-height: 1.6;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .step-item {
+            background-color: #1a2027;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            border-left: 4px solid #FF6C37;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+        
+        .step-item p.card-text strong.step-number {
+            color: #FF6C37;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        footer.page-footer {
+            width: 100%;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+            border-top: 1px solid #2a3038;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInSlideUp 0.7s ease-in-out 1s forwards; /* Delayed footer animation */
+        }
+    </style>
+</head>
+<body>
+    <section class="hero-section">
+        <header class="hero-header">
+            <h1 class="main-title">Coin Fund API</h1>
+        </header>
+        <main class="hero-main">
+            <p class="sub-text">
+                Welcome to Coin Fund API. Please refer to the documentation for the API from the Postman button.
+            </p>
+            <a
+                href="https://documenter.getpostman.com/view/19622729/2sB2qi9HuU" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="button-primary"
+            >
+                View Postman Documentation
+            </a>
+        </main>
+    </section>
+
+    <!-- Section 1: Why Coin Fund API? -->
+    <section class="content-section">
+        <h2 class="section-title">Power Up Your Applications</h2>
+        <div class="card-container">
+            <div class="card">
+                <h3 class="card-title"><span class="icon-placeholder">[ℹ]</span>Reliable & Scalable</h3>
+                <p class="card-text">Built for performance, our API handles your requests efficiently, scaling with your needs.</p>
+            </div>
+            <div class="card">
+                <h3 class="card-title"><span class="icon-placeholder">[📖]</span>Developer-Friendly</h3>
+                <p class="card-text">Clear documentation and intuitive design make integration a breeze for developers.</p>
+            </div>
+            <div class="card">
+                <h3 class="card-title"><span class="icon-placeholder">[❯]</span>Innovative Features</h3>
+                <p class="card-text">Access cutting-edge functionalities to build next-generation applications.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Core Functionality -->
+    <section class="content-section">
+        <h2 class="section-title">Unlock Key Capabilities</h2>
+         <div class="card-container">
+            <div class="card">
+                <h3 class="card-title"><span class="icon-placeholder">[📄]</span>Data Processing</h3>
+                <p class="card-text">Leverage powerful algorithms for real-time data analysis and transformation.</p>
+            </div>
+            <div class="card">
+                <h3 class="card-title"><span class="icon-placeholder">[✉]</span>Automated Communications</h3>
+                <p class="card-text">Seamlessly integrate automated notifications and messaging into your workflows.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Getting Started -->
+    <section class="content-section">
+        <h2 class="section-title">Integrate in Minutes</h2>
+        <ol class="step-list">
+            <li class="step-item">
+                <p class="card-text"><strong class="step-number">1.</strong>Sign up and obtain your unique API key from your dashboard.</p>
+            </li>
+            <li class="step-item">
+                <p class="card-text"><strong class="step-number">2.</strong>Consult our comprehensive documentation for endpoint details and request examples.</p>
+            </li>
+            <li class="step-item">
+                <p class="card-text"><strong class="step-number">3.</strong>Make your first API call using your preferred language or tool, and start building!</p>
+            </li>
+        </ol>
+    </section>
+
+    <!-- Section 4: Explore & Connect -->
+    <section class="content-section">
+        <h2 class="section-title">Ready to Build?</h2>
+        <p class="sub-text" style="margin-bottom: 2rem; opacity: 1; transform: translateY(0);"> 
+            Dive deeper into our API capabilities or get in touch with our support team.
+        </p>
+        <a
+            href="mailto:support@coinfund.com"
+            class="button-secondary"
+        >
+            Contact Support
+        </a>
+    </section>
+    
+    <footer class="page-footer">
+        <p>&copy; <span id="currentYear"></span> Coin Fund. All rights reserved.</p>
+    </footer>
+
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script>
+        // Small script for dynamic year, kept minimal as per "no other code" preference.
+        // If this is too much, the year can be hardcoded.
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
