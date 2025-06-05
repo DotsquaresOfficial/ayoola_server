@@ -5,7 +5,7 @@ const protect = require('../middleware/authMiddleware');
 
 const { updateUserStatus } = require('../controllers/userController');
 
-router.patch('/:id/status', updateUserStatus); 
+router.patch('/:id/status',protect, updateUserStatus); 
 router.get('/',protect, getAllUsers);
 
 module.exports = router;
