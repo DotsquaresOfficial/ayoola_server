@@ -16,12 +16,17 @@ exports.register = async (req, res) => {
     try {
         const userExists = await User.findOne({ email });
         const idExists = await User.findOne({ id });
-        
+
         if (idExists) {
             return res.status(409).json({ message: 'User already exists with this ID' });
         }
         if (userExists) {
             return res.status(409).json({ message: 'User already exists with this email' });
+        }
+
+        // if role is of admin then password can not be empty
+        if (role === 'admin' && !password) {
+            return res.status(400).json({ message: 'Password is required for admin role' });
         }
 
         const user = new User({
@@ -56,11 +61,14 @@ exports.login = async (req, res, next) => {
         const { email, password } = req.body;
         // create a user with email and password
         const user = await User.findOne({ email });
-
-        console.log(user);
         if (!user || !(await user.matchPassword(password))) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
+        // cehck if user has a role of 'admin'
+        if (user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admins only.' });
+        }
+      
         res.status(200).json({
             success: true,
             message: "Successfully logged in.",
