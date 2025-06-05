@@ -24,3 +24,33 @@ exports.getAllUsers = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+exports.updateUserStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  // Validate status value
+  if (!["active", "inactive"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status. Use 'active' or 'inactive'." });
+  }
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { id },
+      { status },
+      { new: true, fields: { _id: 0, id: 1, name: 1, email: 1, status: 1 } }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json({
+      message: `User status updated to '${status}'`,
+      user
+    });
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    res.status(500).json({ message: "Server error while updating status." });
+  }
+};
