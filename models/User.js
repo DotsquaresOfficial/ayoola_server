@@ -35,6 +35,18 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    points: {
+      type: Number,
+      default: 0,
+    },
+    steps: {
+      type: Number,
+      default: 0,
+    },
+    referrals: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
@@ -43,7 +55,7 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
 
   if (!this.isModified("password")) return next();
-  
+
   if (!this.password) {
     return next();
   }

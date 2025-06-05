@@ -8,7 +8,7 @@ const path = require('path');
 const errorMiddleware = require("../middleware/errorMiddleware");
 const connectDB = require('../config/database');
 const authRoutes = require("../routes/authRoutes");
-
+const userRoutes = require("../routes/userRoutes");
 connectDB();
 
 require("dotenv").config();
@@ -23,18 +23,20 @@ app.use(morgan("common"));
 app.use(cors());
 
 // Serve public folder
-app.use(express.static(path.join(__dirname,"..", 'public', )));
+app.use(express.static(path.join(__dirname, "..", 'public',)));
 
 // Default route
 // Serve index.html when '/' is accessed
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname,"..", 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, "..", 'public', 'index.html'));
 });
 
 // Auth Route
 app.use('/api/v1/auth', authRoutes);
 
-// Error middleware
+// Users Route
+app.use('/api/v1/users', userRoutes);
+
 app.use(errorMiddleware);
 
 module.exports = app;
