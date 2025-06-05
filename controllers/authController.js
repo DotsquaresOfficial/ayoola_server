@@ -1,48 +1,53 @@
 
 const connectDB = require('../config/database');
-const User = require('../models/user');
+const User = require('../models/User');
 const generateToken = require('../utils/genrateToken');
 const { registerSchema } = require('../validations/authValidation');
 
 exports.register = async (req, res) => {
-  // Validate input with Joi
-  const { error } = registerSchema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-
-  const { id, name, email, phone, password, role } = req.body;
-
-  try {
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(409).json({ message: 'User already exists with this email' });
+    // Validate input with Joi
+    const { error } = registerSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
     }
 
-    const user = new User({
-      id,
-      name,
-      email,
-      phone,
-      password,
-      role,
-    });
+    const { id, name, email, phone, password, role } = req.body;
 
-    await user.save();
+    try {
+        const userExists = await User.findOne({ email });
+        const idExists = await User.findOne({ id });
+        
+        if (idExists) {
+            return res.status(409).json({ message: 'User already exists with this ID' });
+        }
+        if (userExists) {
+            return res.status(409).json({ message: 'User already exists with this email' });
+        }
 
-    return res.status(201).json({
-      message: `User registered successfully`,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Server error while registering user' });
-  }
+        const user = new User({
+            id,
+            name,
+            email,
+            phone,
+            password,
+            role,
+        });
+
+        await user.save();
+
+        return res.status(201).json({
+            message: `User registered successfully`,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Server error while registering user' });
+    }
 };
 
 
@@ -57,8 +62,8 @@ exports.login = async (req, res, next) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
         res.status(200).json({
-            success:true,
-            message:"Successfully logged in.",
+            success: true,
+            message: "Successfully logged in.",
             token: generateToken(user._id),
             user: { id: user._id, email: user.email }
         });
