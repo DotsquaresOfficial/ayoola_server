@@ -31,7 +31,7 @@ exports.register = async (req, res) => {
     await user.save();
 
     return res.status(201).json({
-      message: `${role.charAt(0).toUpperCase() + role.slice(1)} registered successfully`,
+      message: `User registered successfully`,
       user: {
         id: user.id,
         name: user.name,
