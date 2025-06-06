@@ -9,6 +9,7 @@ const errorMiddleware = require("../middleware/errorMiddleware");
 const connectDB = require('../config/database');
 const authRoutes = require("../routes/authRoutes");
 const userRoutes = require("../routes/userRoutes");
+const analyticsRoutes = require("../routes/analyticsRoute");
 connectDB();
 
 require("dotenv").config();
@@ -36,6 +37,8 @@ app.use('/api/v1/auth', authRoutes);
 
 // Users Route
 app.use('/api/v1/users', userRoutes);
+
+app.use('/api/v1/analytics', analyticsRoutes);
 
 app.use(errorMiddleware);
 
