@@ -54,3 +54,30 @@ exports.updateUserStatus = async (req, res) => {
     res.status(500).json({ message: "Server error while updating status." });
   }
 };
+
+exports.updateMultipleUserStatuses = async (req, res) => {
+  const { ids, status } = req.body;
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ message: "Please provide an array of user IDs." });
+  }
+
+  if (!["active", "inactive"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status. Use 'active' or 'inactive'." });
+  }
+
+  try {
+    const result = await User.updateMany(
+      { id: { $in: ids } },
+      { $set: { status } }
+    );
+
+    res.status(200).json({
+      message: `Updated status of ${result.modifiedCount} users to '${status}'.`,
+      modifiedCount: result.modifiedCount
+    });
+  } catch (error) {
+    console.error("Error updating user statuses:", error);
+    res.status(500).json({ message: "Server error while updating statuses." });
+  }
+};

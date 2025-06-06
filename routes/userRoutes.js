@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers } = require('../controllers/userController');
+const { getAllUsers, updateMultipleUserStatuses } = require('../controllers/userController');
 const protect = require('../middleware/authMiddleware');
 
 const { updateUserStatus } = require('../controllers/userController');
 
-router.patch('/:id/status',protect, updateUserStatus); 
+router.patch('/:id/update-status',protect, updateUserStatus); 
 router.get('/',protect, getAllUsers);
+router.patch('/update-multiple-status', updateMultipleUserStatuses); 
 
 module.exports = router;
