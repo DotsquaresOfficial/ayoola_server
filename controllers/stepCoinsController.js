@@ -136,6 +136,45 @@ exports.approveStepCoinRequest = async (req, res, next) => {
   }
 };
 
+exports.bulkApproveStepCoinRequests = async (req, res, next) => {
+  try {
+    const admin = req.user;
+    const { requestIds } = req.body;
+
+    if (!Array.isArray(requestIds) || requestIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'No request IDs provided.' });
+    }
+
+    const requests = await StepCoinConversion.find({ 
+      _id: { $in: requestIds }, 
+      status: 'pending' 
+    });
+
+    if (requests.length === 0) {
+      return res.status(404).json({ success: false, message: 'No pending requests found to approve.' });
+    }
+
+    const updates = requests.map((request) => {
+      request.status = 'approved';
+      request.approve_date = new Date();
+      request.approved_by = admin._id;
+      request.approved_by_name = admin.name || admin.email;
+      request.reason =  req.body.reason || 'Bulk approved by admin';
+      return request.save();
+    });
+
+    await Promise.all(updates);
+
+    return res.json({
+      success: true,
+      message: `${requests.length} request(s) approved successfully.`,
+      approvedRequests: requests.map(r => r._id)
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 exports.suspectStepCoinRequest = async (req, res, next) => {
   try {
