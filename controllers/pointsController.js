@@ -21,6 +21,10 @@ exports.addPoints = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
+        // while adding points, need to add points to user
+        user.points = (user.points || 0) + points;
+        await user.save();
+
         const newEntry = new PointHistory({
             points,
             user_id,
