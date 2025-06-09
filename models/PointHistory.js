@@ -9,10 +9,6 @@ const pointHistory = new mongoose.Schema({
     type: String,
     required: true,
   },
-  timestamps: {
-    type: Date,
-    default: Date.now,
-  },
   user_id: {
     type: String,
     required: true,
@@ -26,6 +22,6 @@ const pointHistory = new mongoose.Schema({
     enum: ['add', 'deduct'],
     required: true,
   },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('PointHistory', pointHistory);
