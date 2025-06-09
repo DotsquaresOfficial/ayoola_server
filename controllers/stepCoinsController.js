@@ -3,51 +3,18 @@ const express = require('express');
 const router = express.Router();
 const PointHistory = require('../models/PointHistory');
 const User = require('../models/User');
+const StepCoinConversion = require('../models/StepCoinConversion');
 
 
 exports.convertPointsToStepCoins = async (req, res, next) => {
     try {
-        const {  user_id,location } = req.body;
+        const { userId } = req.params;
+        const { wallet_address, location } = req.body;
         const ip = req.ip;
 
         // check if user exists
-        if (!points || !user_id) {
-            return res.status(400).json({ success: false, message: 'Points and user ID are required.' });
-        }
-
-        // check if points user exist in databse
-        const user = await User.findOne({ id: user_id });
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found.' });
-        }
-
-        // while adding points, need to add points to user
-        user.points = (user.points || 0) + points;
-        await user.save();
-
-        const newEntry = new PointHistory({
-            points,
-            user_id,
-            location,
-            ip,
-            points_direction: 'add',
-        });
-
-        await newEntry.save();
-        res.status(201).json({ success: true, message: 'Points added successfully.' });
-    } catch (err) {
-        next(err);
-    }
-};
-
-
-exports.getPointsHistory = async (req, res, next) => {
-    try {
-
-         const { userId } = req.params;
-
-        if (!userId) {
-            return res.status(400).json({ success: false, message: 'Points and user ID are required.' });
+        if (!wallet_address || !userId || !location) {
+            return res.status(400).json({ success: false, message: 'Wallet address, user ID and location are required.' });
         }
 
         // check if points user exist in databse
@@ -56,16 +23,73 @@ exports.getPointsHistory = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
-        const history = await PointHistory.find({ user_id: userId }).sort({ timestamps: -1 });
-         if (!history) {
+        // check if user has enough points
+        if (!user.points || user.points < 10000) {
+            return res.status(400).json({ success: false, message: 'Insufficient points. You need at least 10000 points to convert.' });
+        }
+
+        // deduct points from user
+        const points = user.points; n
+        user.points = 0;
+        user.steps = (user.steps || 0) + (points / 100);
+        user.lastActiveDate = new Date();
+        await user.save();
+        // create a new step coin conversion entry
+        const newEntry = new PointHistory({
+            points,
+            user_id: user.id,
+            location,
+            ip,
+            points_direction: 'deduct',
+        });
+
+        await newEntry.save();
+        // create a new step coin conversion entry
+        const stepCoinConversion = new StepCoinConversion({
+            user_name: user.name,
+            user_id: user.id,
+            steps_coins: points / 100, 
+            points,
+            wallet_address,
+            location,
+            ip,
+        });
+
+        await stepCoinConversion.save();
+        res.status(201).json({ success: true, message: 'Points converted to step coins successfully.' });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+exports.getStepCoinsConversionHistory = async (req, res, next) => {
+    try {
+
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'user ID are required.' });
+        }
+
+        // check if points user exist in databse
+        const user = await User.findOne({ id: userId });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        const history = await StepCoinConversion.find({ user_id: userId }).sort({ timestamps: -1 });
+        if (!history) {
             return res.status(404).json({ success: false, message: 'History not found.' });
         }
         // add total points to history
-        const historyData={
+        const historyData = {
             totalPoints: user.points || 0,
+            totalSteps: user.steps || 0,
             history: history
         }
-         return res.json({  message: 'Points fetched successfully.',success: true, data: historyData });
+        return res.json({ message: 'Points fetched successfully.', success: true, data: historyData });
 
     } catch (err) {
         next(err);

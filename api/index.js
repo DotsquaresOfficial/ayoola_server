@@ -11,6 +11,7 @@ const authRoutes = require("../routes/authRoutes");
 const userRoutes = require("../routes/userRoutes");
 const analyticsRoutes = require("../routes/analyticsRoute");
 const pointsRoutes = require("../routes/pointsRoute");
+const stepCoinsRoutes = require("../routes/stepsCoinRoute");
 connectDB();
 
 require("dotenv").config();
@@ -42,6 +43,8 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 
 app.use('/api/v1/points', pointsRoutes);
+
+app.use('/api/v1/step-coins', stepCoinsRoutes);
 
 app.use(errorMiddleware);
 
