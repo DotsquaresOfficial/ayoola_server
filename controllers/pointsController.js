@@ -57,11 +57,16 @@ exports.getPointsHistory = async (req, res, next) => {
         }
 
         const history = await PointHistory.find({ user_id: userId }).sort({ timestamps: -1 });
+         if (!history) {
+            return res.status(404).json({ success: false, message: 'History not found.' });
+        }
+        // add total points to history
+        const historyData={
+            totalPoints: user.points || 0,
+            history: history
+        }
+         return res.json({  message: 'Points fetched successfully.',success: true, data: historyData });
 
-        res.json({ success: true, data: history });
-
-        await newEntry.save();
-        res.status(201).json({ success: true, message: 'Points added successfully.' });
     } catch (err) {
         next(err);
     }
