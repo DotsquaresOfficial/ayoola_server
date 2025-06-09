@@ -95,3 +95,90 @@ exports.getStepCoinsConversionHistory = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.getPendingStepCoinRequests = async (req, res, next) => {
+  try {
+    const requests = await StepCoinConversion.find({ status: 'pending' }).sort({ createdAt: -1 });
+    res.json({ success: true, data: requests });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+exports.approveStepCoinRequest = async (req, res, next) => {
+  try {
+    const admin = req.user;
+
+    const requestId = req.params.id;
+    const request = await StepCoinConversion.findById(requestId);
+
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Conversion request not found.' });
+    }
+
+    if (request.status !== 'pending') {
+      return res.status(400).json({ success: false, message: `Cannot approve request with status: ${request.status}` });
+    }
+
+    request.status = 'approved';
+    request.approve_date = new Date();
+    request.approved_by = admin._id;
+    request.approved_by_name = admin.name || admin.email;
+    request.reason = req.body.reason || 'Approved by admin';
+
+    await request.save();
+
+    return res.json({ success: true, message: 'Request approved.', data: request });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+exports.suspectStepCoinRequest = async (req, res, next) => {
+  try {
+    
+    const requestId = req.params.id;
+
+    const request = await StepCoinConversion.findById(requestId);
+
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Conversion request not found.' });
+    }
+
+    if (request.status !== 'pending') {
+      return res.status(400).json({ success: false, message: `Cannot mark request with status: ${request.status}` });
+    }
+
+    request.status = 'suspected';
+    request.suspected_date = new Date();
+    request.reason = req.body.reason || 'Marked as suspected by admin';
+
+    await request.save();
+
+    return res.json({ success: true, message: 'Request marked as suspected.', data: request });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+exports.getApprovedStepCoinRequests = async (req, res, next) => {
+  try {
+    const approved = await StepCoinConversion.find({ status: 'approved' }).sort({ approve_date: -1 });
+    res.json({ success: true, data: approved });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+exports.getSuspectedStepCoinRequests = async (req, res, next) => {
+  try {
+    const suspected = await StepCoinConversion.find({ status: 'suspected' }).sort({ suspected_date: -1 });
+    res.json({ success: true, data: suspected });
+  } catch (err) {
+    next(err);
+  }
+};
