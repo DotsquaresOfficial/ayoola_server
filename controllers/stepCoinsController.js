@@ -8,6 +8,7 @@ const StepCoinConversion = require('../models/StepCoinConversion');
 
 exports.convertPointsToStepCoins = async (req, res, next) => {
     try {
+   
         const { userId } = req.params;
         const { wallet_address, location } = req.body;
         const ip = req.ip;
@@ -29,7 +30,7 @@ exports.convertPointsToStepCoins = async (req, res, next) => {
         }
 
         // deduct points from user
-        const points = user.points; n
+        const points = user.points; 
         user.points = 0;
         user.steps = (user.steps || 0) + (points / 100);
         user.lastActiveDate = new Date();

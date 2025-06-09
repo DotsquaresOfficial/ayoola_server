@@ -39,12 +39,11 @@ app.use('/api/v1/auth', authRoutes);
 
 // Users Route
 app.use('/api/v1/users', userRoutes);
-
 app.use('/api/v1/analytics', analyticsRoutes);
-
 app.use('/api/v1/points', pointsRoutes);
-
+   
 app.use('/api/v1/step-coins', stepCoinsRoutes);
+
 
 app.use(errorMiddleware);
 
