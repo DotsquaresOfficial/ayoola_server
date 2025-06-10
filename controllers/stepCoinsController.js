@@ -118,10 +118,6 @@ exports.approveStepCoinRequest = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Conversion request not found.' });
     }
 
-    if (request.status !== 'pending') {
-      return res.status(400).json({ success: false, message: `Cannot approve request with status: ${request.status}` });
-    }
-
     request.status = 'approved';
     request.approve_date = new Date();
     request.approved_by = admin._id;
