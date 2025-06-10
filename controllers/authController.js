@@ -99,10 +99,8 @@ exports.login = async (req, res, next) => {
       success: true,
       status: 200,
       message: "Successfully logged in.",
-      data: {
-        token: generateToken(user._id),
-        user: { id: user._id, email: user.email },
-      },
+      token: generateToken(user._id),
+      user: { id: user._id, email: user.email },
     });
   } catch (err) {
     return res.status(500).json({
