@@ -10,13 +10,13 @@ exports.getDashboardStats = async (req, res) => {
         const users = await User.find({}, { points: 1 });
         let totalPoints = 0;
         users.forEach(user => {
-            totalPoints += user.points;
+        totalPoints += user.points || 0;
         });
 
         // add steps from all users
         let totalSteps = 0; 
         users.forEach(user => {
-            totalSteps += user.steps;
+            totalSteps += user.steps || 0;
         });
 
        
@@ -30,16 +30,16 @@ exports.getDashboardStats = async (req, res) => {
                     growth: 32
                 },
                 points: {
-                    totalPoints: totalPoints,
+                    totalPoints: totalPoints || 0,
                     growth: 43
                 },
 
                 pointsConverted: {
-                    pointsConverted: totalSteps*10,
+                    pointsConverted: totalSteps*10 || 0, // Assuming each step converts to 10 points
                     growth: 65
                 },
                 conversions: {
-                    totalConversions: (totalSteps*10*100)/(totalSteps*10 + totalPoints),
+                    totalConversions: (totalSteps*10*100)/(totalSteps*10 + totalPoints) || 0, // Assuming conversion rate is based on total points and steps
                     growth: 45
                 },
             }
