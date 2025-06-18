@@ -83,15 +83,25 @@ exports.getPointsHistory = async (req, res, next) => {
     const history = await PointHistory.find({ user_id: userId }).sort({
       timestamps: -1,
     });
+
+   
+
     if (!history) {
       return res
         .status(404)
         .json({ status: 400, success: false, message: "History not found." });
     }
+
+     const updatedHistory = history.map(item => {
+      if (item.from == null) {
+        item.from = "steps";
+      }
+      return item;
+    });
     // add total points to history
     const historyData = {
       totalPoints: user.points || 0,
-      history: history,
+      history: updatedHistory,
     };
     return res.json({
       status: 200,
