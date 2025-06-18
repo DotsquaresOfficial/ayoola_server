@@ -7,17 +7,17 @@ const { date } = require("joi");
 
 exports.addPoints = async (req, res, next) => {
   try {
-    const { points, user_id, location } = req.body;
+    const { points, user_id, location ,from} = req.body;
     const ip = req.ip;
 
     // check if user exists
-    if (!points || !user_id) {
+    if (!points || !user_id || !from) {
       return res
         .status(400)
         .json({
           status: 400,
           success: false,
-          message: "Points and user ID are required.",
+          message: "Points, from and user ID are required.",
         });
     }
 
@@ -38,6 +38,7 @@ exports.addPoints = async (req, res, next) => {
       user_id,
       location,
       ip,
+      from,
       points_direction: "add",
     });
 

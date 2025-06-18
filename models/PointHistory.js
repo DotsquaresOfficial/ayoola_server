@@ -17,6 +17,10 @@ const pointHistory = new mongoose.Schema({
     type: String,
     required: false,
   },
+  from: {
+    type: String,
+    required: false,
+  },
   points_direction: {
     type: String,
     enum: ['add', 'deduct'],
