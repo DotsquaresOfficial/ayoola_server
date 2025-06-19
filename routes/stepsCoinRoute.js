@@ -3,6 +3,7 @@ const { convertPointsToStepCoins, getStepCoinsConversionHistory, getPendingStepC
 const protect = require('../middleware/authMiddleware');
 const router = express.Router();
 
+router.post('/get-balance/:walletAddress', convertPointsToStepCoins);
 router.post('/convert/:userId', convertPointsToStepCoins);
 router.get('/convert-history/:userId', getStepCoinsConversionHistory); 
 router.get('/requests',protect, getPendingStepCoinRequests); 

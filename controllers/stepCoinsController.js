@@ -4,6 +4,7 @@ const router = express.Router();
 const PointHistory = require("../models/PointHistory");
 const User = require("../models/User");
 const StepCoinConversion = require("../models/StepCoinConversion");
+const { ethers } = require("ethers");
 
 exports.convertPointsToStepCoins = async (req, res, next) => {
   try {
@@ -85,6 +86,39 @@ exports.convertPointsToStepCoins = async (req, res, next) => {
   }
 };
 
+const provider = new ethers.JsonRpcProvider('https://polygon-rpc.com/');
+exports.getWalletBalance = async (req, res, next) => {
+  try {
+        const { walletAddress } = req.params;
+
+        // Validate wallet address
+        if (!ethers.isAddress(walletAddress)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid wallet address"
+            });
+        }
+
+        const balance = await provider.getBalance(walletAddress);
+        const balanceInEth = ethers.formatEther(balance); // Convert from wei
+
+        res.status(200).json({
+            success: true,
+            message: `Balance fetched successfully for ${walletAddress}`,
+            data: {
+                walletAddress,
+                balance: balanceInEth
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching balance:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch wallet balance",
+            error: error.message
+        });
+    }
+};
 exports.getStepCoinsConversionHistory = async (req, res, next) => {
   try {
     const { userId } = req.params;
