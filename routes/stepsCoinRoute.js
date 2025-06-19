@@ -1,9 +1,9 @@
 const express = require('express');
-const { convertPointsToStepCoins, getStepCoinsConversionHistory, getPendingStepCoinRequests, approveStepCoinRequest, bulkApproveStepCoinRequests, suspectStepCoinRequest, getApprovedStepCoinRequests, getSuspectedStepCoinRequests } = require('../controllers/stepCoinsController');
+const { convertPointsToStepCoins, getStepCoinsConversionHistory, getPendingStepCoinRequests, approveStepCoinRequest, bulkApproveStepCoinRequests, suspectStepCoinRequest, getApprovedStepCoinRequests, getSuspectedStepCoinRequests, getWalletBalance } = require('../controllers/stepCoinsController');
 const protect = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.post('/get-balance/:walletAddress', convertPointsToStepCoins);
+router.post('/get-balance/:walletAddress', getWalletBalance);
 router.post('/convert/:userId', convertPointsToStepCoins);
 router.get('/convert-history/:userId', getStepCoinsConversionHistory); 
 router.get('/requests',protect, getPendingStepCoinRequests); 
