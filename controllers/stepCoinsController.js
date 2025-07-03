@@ -6,6 +6,557 @@ const User = require("../models/User");
 const StepCoinConversion = require("../models/StepCoinConversion");
 const { ethers } = require("ethers");
 
+const ERC20_ABI = [
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "allowance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "needed",
+        "type": "uint256"
+      }
+    ],
+    "name": "ERC20InsufficientAllowance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "needed",
+        "type": "uint256"
+      }
+    ],
+    "name": "ERC20InsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "approver",
+        "type": "address"
+      }
+    ],
+    "name": "ERC20InvalidApprover",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      }
+    ],
+    "name": "ERC20InvalidReceiver",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "ERC20InvalidSender",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "ERC20InvalidSpender",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Approval",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_DAILY_REWARD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "TOTAL_SUPPLY",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "adminBurn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "allowance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "burn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "lastClaimedDay",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "steps",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rewardAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "rewardSteps",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "stakedAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "stepsToday",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "transferFrom",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "unstake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
+const provider = new ethers.JsonRpcProvider('https://polygon-amoy.infura.io/v3/b94a21d7655b424e88f7700f411afb97');
+const stepCoinContractAddress = '0x8639b6D09A669C672d9F6375eD50E45fcC9EF70C';
+const stepCoinHolderPrivateKey = '4e87dedb850d2d1eb1f7ab1bb26a5545e1678fcad65894c46ea2f9e3c58678a4'
+
 exports.convertPointsToStepCoins = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -75,7 +626,7 @@ exports.convertPointsToStepCoins = async (req, res, next) => {
         status: 200,
         success: true,
         message: "Points converted to step coins successfully.",
-        data:stepCoinConversion.toJSON()
+        data: stepCoinConversion.toJSON()
       });
   } catch (err) {
     return res.status(500).json({
@@ -86,38 +637,39 @@ exports.convertPointsToStepCoins = async (req, res, next) => {
   }
 };
 
-const provider = new ethers.JsonRpcProvider('https://polygon-rpc.com/');
+
 exports.getWalletBalance = async (req, res, next) => {
   try {
-        const { walletAddress } = req.params;
+    const { walletAddress } = req.params;
 
-        // Validate wallet address
-        if (!ethers.isAddress(walletAddress)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid wallet address"
-            });
-        }
-
-        const balance = await provider.getBalance(walletAddress);
-        const balanceInEth = ethers.formatEther(balance); // Convert from wei
-
-        res.status(200).json({
-            success: true,
-            message: `Balance fetched successfully for ${walletAddress}`,
-            data: {
-                walletAddress,
-                balance: balanceInEth
-            }
-        });
-    } catch (error) {
-        console.error("Error fetching balance:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to fetch wallet balance",
-            error: error.message
-        });
+    // Validate wallet address
+    if (!ethers.isAddress(walletAddress)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid wallet address"
+      });
     }
+    // Get the balance of step coins for the given wallet address
+    const stepCoinContract = new ethers.Contract(stepCoinContractAddress, ERC20_ABI, provider);
+    const balance = await stepCoinContract.balanceOf(walletAddress);
+    const balanceInEth = ethers.formatEther(balance);
+
+    res.status(200).json({
+      success: true,
+      message: `Balance fetched successfully for ${walletAddress}`,
+      data: {
+        walletAddress,
+        balance: balanceInEth
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching balance:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch wallet balance",
+      error: error.message
+    });
+  }
 };
 exports.getStepCoinsConversionHistory = async (req, res, next) => {
   try {
@@ -126,7 +678,7 @@ exports.getStepCoinsConversionHistory = async (req, res, next) => {
     if (!userId) {
       return res
         .status(400)
-        .json({ status:400,success: false, message: "user ID are required." });
+        .json({ status: 400, success: false, message: "user ID are required." });
     }
 
     // check if points user exist in databse
@@ -134,7 +686,7 @@ exports.getStepCoinsConversionHistory = async (req, res, next) => {
     if (!user) {
       return res
         .status(404)
-        .json({status:404, success: false, message: "User not found." });
+        .json({ status: 404, success: false, message: "User not found." });
     }
 
     const history = await StepCoinConversion.find({ user_id: userId }).sort({
@@ -143,7 +695,7 @@ exports.getStepCoinsConversionHistory = async (req, res, next) => {
     if (!history) {
       return res
         .status(404)
-        .json({ status:404,success: false, message: "History not found." });
+        .json({ status: 404, success: false, message: "History not found." });
     }
     // add total points to history
     const historyData = {
@@ -152,7 +704,7 @@ exports.getStepCoinsConversionHistory = async (req, res, next) => {
       history: history,
     };
     return res.json({
-      status:200,
+      status: 200,
       message: "Points fetched successfully.",
       success: true,
       data: historyData,
@@ -189,6 +741,13 @@ exports.approveStepCoinRequest = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Conversion request not found." });
     }
+
+    const senderWallet = new ethers.Wallet(stepCoinHolderPrivateKey, provider);
+    const stepCoinContract = new ethers.Contract(stepCoinContractAddress, ERC20_ABI, senderWallet);
+    const amountInWei = ethers.utils.parseUnits(request.steps_coins, 18);
+
+
+    const tx = await stepCoinContract.transfer(request.wallet_address, amountInWei);
 
     request.status = "approved";
     request.approve_date = new Date();
@@ -232,17 +791,23 @@ exports.bulkApproveStepCoinRequests = async (req, res, next) => {
           message: "No pending requests found to approve.",
         });
     }
-
-    const updates = requests.map((request) => {
-      request.status = "approved";
-      request.approve_date = new Date();
-      request.approved_by = admin._id;
-      request.approved_by_name = admin.name || admin.email;
-      request.reason = req.body.reason || "Bulk approved by admin";
-      return request.save();
-    });
-
-    await Promise.all(updates);
+    const senderWallet = new ethers.Wallet(stepCoinHolderPrivateKey, provider);
+    const stepCoinContract = new ethers.Contract(stepCoinContractAddress, ERC20_ABI, senderWallet);
+    for (const request of requests) {
+      try {
+        const amountInWei = ethers.utils.parseUnits(request.steps_coins.toString(), 18);
+        const tx = await stepCoinContract.transfer(request.wallet_address, amountInWei);
+        request.status = "approved";
+        request.approve_date = new Date();
+        request.approved_by = admin._id;
+        request.approved_by_name = admin.name || admin.email;
+        request.reason = req.body.reason || "Bulk approved by admin";
+        await request.save();
+      } catch (error) {
+        console.error(`Error processing request ${request._id}:`, error);
+        continue; // Skip this request and continue with the next
+      }
+    }
 
     return res.json({
       success: true,
