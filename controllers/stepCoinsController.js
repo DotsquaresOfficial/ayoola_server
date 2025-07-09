@@ -744,7 +744,7 @@ exports.approveStepCoinRequest = async (req, res, next) => {
 
     const senderWallet = new ethers.Wallet(stepCoinHolderPrivateKey, provider);
     const stepCoinContract = new ethers.Contract(stepCoinContractAddress, ERC20_ABI, senderWallet);
-    const amountInWei = ethers.utils.parseUnits(request.steps_coins, 18);
+    const amountInWei = ethers.parseUnits(request.steps_coins, 18);
 
 
     const tx = await stepCoinContract.transfer(request.wallet_address, amountInWei);
@@ -795,7 +795,7 @@ exports.bulkApproveStepCoinRequests = async (req, res, next) => {
     const stepCoinContract = new ethers.Contract(stepCoinContractAddress, ERC20_ABI, senderWallet);
     for (const request of requests) {
       try {
-        const amountInWei = ethers.utils.parseUnits(request.steps_coins.toString(), 18);
+        const amountInWei = ethers.parseUnits(request.steps_coins.toString(), 18);
         const tx = await stepCoinContract.transfer(request.wallet_address, amountInWei);
         request.status = "approved";
         request.approve_date = new Date();
