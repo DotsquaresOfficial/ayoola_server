@@ -583,21 +583,21 @@ exports.convertPointsToStepCoins = async (req, res, next) => {
     }
 
     // check if user has enough points
-    if (!user.points || user.points < 10000) {
+    if (!user.points || user.points <= 0) {
       return res
         .status(400)
         .json({
           status: 400,
           success: false,
           message:
-            "Insufficient points. You need at least 10000 points to convert.",
+            "Insufficient points. You need at least 1 point to convert.",
         });
     }
 
     // deduct points from user
     const points = user.points;
     user.points = 0;
-    user.steps = (user.steps || 0) + points / 100;
+    user.steps = (user.steps || 0) + points;
     user.lastActiveDate = new Date();
     await user.save();
     const newEntry = new PointHistory({
@@ -612,7 +612,7 @@ exports.convertPointsToStepCoins = async (req, res, next) => {
     const stepCoinConversion = new StepCoinConversion({
       user_name: user.name,
       user_id: user.id,
-      steps_coins: points / 100,
+      steps_coins: points ,
       points,
       wallet_address,
       location,
@@ -690,7 +690,7 @@ exports.getStepCoinsConversionHistory = async (req, res, next) => {
     }
 
     const history = await StepCoinConversion.find({ user_id: userId }).sort({
-      timestamps: -1,
+       createdAt: -1,
     });
     if (!history) {
       return res
