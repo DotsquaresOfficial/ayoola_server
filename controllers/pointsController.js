@@ -7,18 +7,16 @@ const { date } = require("joi");
 
 exports.addPoints = async (req, res, next) => {
   try {
-    const { points, user_id, location ,from} = req.body;
+    const { points, user_id, location, from } = req.body;
     const ip = req.ip;
 
     // check if user exists
     if (!points || !user_id || !from) {
-      return res
-        .status(400)
-        .json({
-          status: 400,
-          success: false,
-          message: "Points, from and user ID are required.",
-        });
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "Points, from and user ID are required.",
+      });
     }
 
     // check if points user exist in databse
@@ -63,17 +61,15 @@ exports.getPointsHistory = async (req, res, next) => {
     const { userId } = req.params;
 
     if (!userId) {
-      return res
-        .status(400)
-        .json({
-          status: 400,
-          success: false,
-          message: "Points and user ID are required.",
-        });
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "Points and user ID are required.",
+      });
     }
 
-    // check if points user exist in databse
     const user = await User.findOne({ id: userId });
+
     if (!user) {
       return res
         .status(404)
@@ -81,10 +77,8 @@ exports.getPointsHistory = async (req, res, next) => {
     }
 
     const history = await PointHistory.find({ user_id: userId }).sort({
-      timestamps: -1,
+      createdAt: -1,
     });
-
-   
 
     if (!history) {
       return res
@@ -92,13 +86,13 @@ exports.getPointsHistory = async (req, res, next) => {
         .json({ status: 400, success: false, message: "History not found." });
     }
 
-     const updatedHistory = history.map(item => {
+    const updatedHistory = history.map((item) => {
       if (item.from == null) {
         item.from = "steps";
       }
       return item;
     });
-    // add total points to history
+
     const historyData = {
       totalPoints: user.points || 0,
       history: updatedHistory,
